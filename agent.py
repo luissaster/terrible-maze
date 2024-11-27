@@ -86,7 +86,8 @@ class Agent:
             goal (tuple): The goal position of the search. A tuple of two integers (row, column).
 
         Returns:
-            tuple: A tuple containing the shortest path as a list of tuples and a list of all visited cells.
+            tuple: A tuple containing the shortest path as a list of tuples, the total number of steps taken, 
+                and a list of all visited cells.
         """
         queue = deque([start])
         visited = set()  # To keep track of visited cells
@@ -94,6 +95,8 @@ class Agent:
         all_visited = []  # List to store all visited cells for drawing
 
         visited.add(start)
+
+        steps = 0
 
         while queue:
             current = queue.popleft()
@@ -108,7 +111,7 @@ class Agent:
                 while current:
                     path.append(current)
                     current = came_from.get(current)
-                return path[::-1], all_visited  # Return the path and all visited cells
+                return path[::-1], steps, all_visited  # Return the path, total steps, and all visited cells
 
             # Explore neighbors (in the order: ↑ up, ← left, → right, ↓ down)
             neighbors = self.get_neighbors(maze, current)
@@ -118,5 +121,7 @@ class Agent:
                     visited.add(neighbor)
                     came_from[neighbor] = current
 
-        return None, all_visited
+            steps += 1
+
+        return None, steps, all_visited
 
