@@ -1,17 +1,14 @@
 import pygame
-
+from maze import Maze
+from agent import Agent
 # Constants
 CELL_SIZE = 64
 ROWS, COLS = 12, 12
 SCREEN_SIZE = (CELL_SIZE * COLS, CELL_SIZE * ROWS)
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-BLUE = (0, 0, 255)
-GREEN = (0, 255, 0)
 
 # Maze defined on the assignment
 # 0 = wall, 1 = path
-maze = [
+defined_maze = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0],
     [0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0],
@@ -26,14 +23,6 @@ maze = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 ]
 
-def draw_maze(screen, maze):
-    for row in range(len(maze)):
-        for col in range(len(maze[0])):
-            if maze[row][col] == 1:
-                pygame.draw.rect(screen, WHITE, (col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE))
-            elif maze[row][col] == 0:
-                pygame.draw.rect(screen, BLACK, (col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE))
-
 def main():
     pygame.init()
 
@@ -41,25 +30,66 @@ def main():
     screen = pygame.display.set_mode(SCREEN_SIZE)
     pygame.display.set_caption("Terrible Maze")
 
+    # Maze setup
+    maze = Maze(defined_maze)
+
+    # Agent setup
+    agent_start = (4, 11)
+    agent_goal = (10, 0)
+    agent = Agent(agent_start[0], agent_start[1])
+    
+    # Calculate agent path
+    agent_final_path, agent_path = agent.breadth_first_search(maze.maze, agent_start, agent_goal)
+    
+    # Path visualization
+    path_index = 0
+
     # Game loop
     clock = pygame.time.Clock()
     running = True
+    print(agent_final_path)
     while running:
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
 
+            """
+            Agent input
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_UP:
+                    agent.move("up", maze.maze, ROWS, COLS)
+                elif event.key == pygame.K_DOWN:
+                    agent.move("down", maze.maze, ROWS, COLS)
+                elif event.key == pygame.K_LEFT:
+                    agent.move("left", maze.maze, ROWS, COLS)
+                elif event.key == pygame.K_RIGHT:
+                    agent.move("right", maze.maze, ROWS, COLS)
+            """
+
+        # Update the agent's position along the path
+        if agent_final_path and path_index < len(agent_final_path):
+            agent.y, agent.x = agent_final_path[path_index]
+            path_index += 1
+
         # Clear the screen
-        screen.fill(BLACK)
+        screen.fill(pygame.Color("black"))
 
         # Draw the maze
-        draw_maze(screen, maze)
+        maze.draw(screen, CELL_SIZE)
 
+        # Draw the best path
+        if agent_final_path:
+            maze.draw_path(screen, agent_final_path[:path_index], "green", CELL_SIZE)
+
+        # Draw the agent
+        agent.draw(screen, CELL_SIZE)
+        
         # Update the display
         pygame.display.flip()
 
         # Limit the frame rate
-        clock.tick(60)
+        clock.tick(5)
 
     # Quit Pygame
     pygame.quit()
