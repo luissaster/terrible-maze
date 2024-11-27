@@ -32,3 +32,16 @@ class Maze:
         for cell in path:
             pygame.draw.rect(screen, pygame.color.Color(color), (cell[1] * CELL_SIZE, cell[0] * CELL_SIZE, CELL_SIZE, CELL_SIZE))
 
+    def draw_start_goal(self, screen, start, goal, CELL_SIZE):
+        """
+        Draws the start and goal positions on the given screen.
+
+        Parameters:
+            screen (pygame.Surface): The screen to draw on.
+            start (tuple): A tuple representing the start position as (row, column).
+            goal (tuple): A tuple representing the goal position as (row, column).
+            CELL_SIZE (int): The size of each cell in the maze.
+        """
+        pygame.draw.rect(screen, pygame.color.Color("red"), (start[1] * CELL_SIZE, start[0] * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+        pygame.draw.rect(screen, pygame.color.Color("green"), (goal[1] * CELL_SIZE, goal[0] * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+

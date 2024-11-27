@@ -44,7 +44,7 @@ class Agent:
             CELL_SIZE (int): The size of each cell in the maze.
         """
         
-        pygame.draw.rect(screen, pygame.color.Color("red"), (self.x * CELL_SIZE, self.y * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+        pygame.draw.rect(screen, pygame.color.Color("purple"), (self.x * CELL_SIZE, self.y * CELL_SIZE, CELL_SIZE, CELL_SIZE))
 
     def get_neighbors(self, maze, pos):
         """
@@ -118,6 +118,56 @@ class Agent:
             for neighbor in neighbors:
                 if neighbor not in visited:
                     queue.append(neighbor)
+                    visited.add(neighbor)
+                    came_from[neighbor] = current
+
+            steps += 1
+
+        return None, steps, all_visited
+    
+    def depth_first_search(self, maze, start, goal):
+        """
+        Performs a depth-first search to find the shortest path from the start to the goal.
+
+        Parameters:
+            maze (list): A 2D list representing the maze. 0 represents a wall and 1 represents an open path.
+            start (tuple): The starting position of the search. A tuple of two integers (row, column).
+            goal (tuple): The goal position of the search. A tuple of two integers (row, column).
+
+        Returns:
+            tuple: A tuple containing the shortest path as a list of tuples, the total number of steps taken,
+                and a list of all visited cells.
+        """
+
+        stack = [start]
+        visited = set()  # To keep track of visited cells
+        came_from = {}  # To reconstruct the shortest path
+        all_visited = []  # List to store all visited cells for drawing
+
+        visited.add(start)
+
+        steps = 0
+
+        while stack:
+            current = stack.pop()
+
+            # Add the current cell to the list of visited cells
+            all_visited.append(current)
+
+            # Check if we reached the goal
+            if current == goal:
+                # Reconstruct the path to the goal
+                path = []
+                while current:
+                    path.append(current)
+                    current = came_from.get(current)
+                return path[::-1], steps, all_visited  # Return the path, total steps, and all visited cells
+
+            # Explore neighbors (in the order: ↑ up, ← left, → right, ↓ down)
+            neighbors = self.get_neighbors(maze, current)
+            for neighbor in neighbors:
+                if neighbor not in visited:
+                    stack.append(neighbor)
                     visited.add(neighbor)
                     came_from[neighbor] = current
 

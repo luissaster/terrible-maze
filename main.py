@@ -1,14 +1,16 @@
+import os
+import datetime
 import pygame
 from maze import Maze
 from agent import Agent
+from menu import show_menu
 
 # Constants
 CELL_SIZE = 64
 ROWS, COLS = 12, 12
 SCREEN_SIZE = (CELL_SIZE * COLS, CELL_SIZE * ROWS)
 
-# Maze defined on the assignment
-# 0 = wall, 1 = path
+# Maze definition
 defined_maze = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0],
@@ -24,62 +26,43 @@ defined_maze = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 ]
 
-def draw_menu(screen):
-    """Draws the main menu screen."""
-    screen.fill((30, 30, 30))
-
-    title_font = pygame.font.Font(None, 74)
-    title = title_font.render("Terrible Maze", True, (255, 255, 255))
-    title_rect = title.get_rect(center=(SCREEN_SIZE[0] // 2, 100))
-    screen.blit(title, title_rect)
-
-    option_font = pygame.font.Font(None, 48)
-    start_text = option_font.render("1. Start Game", True, (255, 255, 255))
-    start_rect = start_text.get_rect(center=(SCREEN_SIZE[0] // 2, 250))
-    screen.blit(start_text, start_rect)
-
-    exit_text = option_font.render("2. Exit", True, (255, 255, 255))
-    exit_rect = exit_text.get_rect(center=(SCREEN_SIZE[0] // 2, 350))
-    screen.blit(exit_text, exit_rect)
-
-    pygame.display.flip()
-
-def show_menu():
+def save_report(algorithm, start, goal, final_path, path):
     """
-    Handles the main menu logic.
+    Saves the maze solving details to a report file inside the 'txt' folder.
 
-    Returns:
-        bool: True if the user chose to start the game, False if the user chose to exit.
+    Parameters:
+        algorithm (str): The algorithm used to solve the maze.
+        start (tuple): The start position (row, col).
+        goal (tuple): The goal position (row, col).
+        final_path (list): The final path taken by the agent.
+        path (list): The complete path explored by the algorithm.
     """
-    pygame.init()
-    screen = pygame.display.set_mode(SCREEN_SIZE)
-    pygame.display.set_caption("Terrible Maze")
-    clock = pygame.time.Clock()
+    # Ensure the 'txt' folder exists
+    folder_name = "txt"
+    os.makedirs(folder_name, exist_ok=True)
 
-    running = True
-    while running:
-        
-        draw_menu(screen)
+    # Create a timestamped file name
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    filename = os.path.join(folder_name, f"maze_report_{timestamp}.txt")
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                return False
+    # Write report data to the file
+    with open(filename, "w") as file:
+        file.write(f"Algorithm Used: {algorithm}\n")
+        file.write(f"Start Position: {start}\n")
+        file.write(f"Goal Position: {goal}\n\n")
+        file.write("Complete Path (Explored):\n")
+        file.write(", ".join(map(str, path)) + "\n\n")
+        file.write("Final Path (Optimal):\n")
+        file.write(", ".join(map(str, final_path)) + "\n")
+    
+    print(f"Report saved to {filename}")
 
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_1:  # Start Game
-                    return True
-                elif event.key == pygame.K_2:  # Exit
-                    pygame.quit()
-                    return False
-
-        clock.tick(30)
 
 def main():
     pygame.init()
 
-    # Show the menu
-    if not show_menu():
+    algorithm, highlight, speed = show_menu(SCREEN_SIZE)
+    if algorithm is None:
         return
 
     # Screen setup
@@ -93,38 +76,47 @@ def main():
     start = (4, 11)
     goal = (10, 0)
     agent = Agent(start[0], start[1])
-    
-    # Calculate agent path
-    final_path, steps, path = agent.breadth_first_search(maze.maze, start, goal)
 
-    # Dump agent path into a file
-    with open("agent_path.txt", "w") as f:
-        for cell in path:
-            f.write(f"{cell[0]},{cell[1]}\n")
-    
-    with open("agent_final_path.txt", "w") as f:
-        for cell in final_path:
-            f.write(f"{cell[0]},{cell[1]}\n")
-    
-    # Path visualization
-    path_index = 0
+    # Configure speed
+    speed_mapping = {"Slow": 2, "Normal": 5, "Fast": 10}
+    clock = pygame.time.Clock()
+    frame_rate = speed_mapping[speed]
+
+    # Calculate agent path based on the selected algorithm
+    if algorithm == "Breadth-First Search":
+        final_path, steps, path = agent.breadth_first_search(maze.maze, start, goal)
+    elif algorithm == "Depth-First Search":
+        final_path, steps, path = agent.depth_first_search(maze.maze, start, goal)
+    elif algorithm == "A* Search":
+        final_path, steps, path = agent.a_star_search(maze.maze, start, goal)
 
     # Game loop
-    clock = pygame.time.Clock()
     running = True
-
-    print(f"Steps: {steps}")
+    path_index = 0
+    reached_goal = False
 
     while running:
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
 
-        # Update the agent's position along the path
-        if final_path and path_index < len(final_path):
-            agent.y, agent.x = final_path[path_index]
-            path_index += 1
+        # Move the agent and highlight the path based on the selected option
+        if not reached_goal:
+            if highlight == "Best Path" and final_path and path_index < len(final_path):
+                agent.y, agent.x = final_path[path_index]
+                path_index += 1
+            elif highlight == "Full Path" and path and path_index < len(path):
+                agent.y, agent.x = path[path_index]
+                path_index += 1
+            elif highlight == "None" and final_path and path_index < len(final_path):
+                agent.y, agent.x = final_path[path_index]
+                path_index += 1
+
+            # Check if the agent has reached the goal
+            if (agent.y, agent.x) == goal:
+                reached_goal = True
+                print(f"Goal reached! Total steps: {steps}")
+                save_report(algorithm, start, goal, final_path, path)
 
         # Clear the screen
         screen.fill(pygame.Color("black"))
@@ -132,20 +124,23 @@ def main():
         # Draw the maze
         maze.draw(screen, CELL_SIZE)
 
-        # Draw the best path
-        if final_path:
-            maze.draw_path(screen, final_path[:path_index], "green", CELL_SIZE)
+        # Draw the path highlight based on the selected option
+        if highlight == "Best Path":
+            maze.draw_path(screen, final_path[:path_index], "cyan", CELL_SIZE)
+        elif highlight == "Full Path":
+            maze.draw_path(screen, path[:path_index], "blue", CELL_SIZE)
+
+        # Draw the start and goal positions
+        maze.draw_start_goal(screen, start, goal, CELL_SIZE)
 
         # Draw the agent
         agent.draw(screen, CELL_SIZE)
-        
-        # Update the display
-        pygame.display.flip()
 
-        # Limit the frame rate
-        clock.tick(5)
+        pygame.display.flip()
+        clock.tick(frame_rate)
 
     pygame.quit()
+
 
 if __name__ == "__main__":
     main()
