@@ -24,8 +24,63 @@ defined_maze = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 ]
 
+def draw_menu(screen):
+    """Draws the main menu screen."""
+    screen.fill((30, 30, 30))
+
+    title_font = pygame.font.Font(None, 74)
+    title = title_font.render("Terrible Maze", True, (255, 255, 255))
+    title_rect = title.get_rect(center=(SCREEN_SIZE[0] // 2, 100))
+    screen.blit(title, title_rect)
+
+    option_font = pygame.font.Font(None, 48)
+    start_text = option_font.render("1. Start Game", True, (255, 255, 255))
+    start_rect = start_text.get_rect(center=(SCREEN_SIZE[0] // 2, 250))
+    screen.blit(start_text, start_rect)
+
+    exit_text = option_font.render("2. Exit", True, (255, 255, 255))
+    exit_rect = exit_text.get_rect(center=(SCREEN_SIZE[0] // 2, 350))
+    screen.blit(exit_text, exit_rect)
+
+    pygame.display.flip()
+
+def show_menu():
+    """
+    Handles the main menu logic.
+
+    Returns:
+        bool: True if the user chose to start the game, False if the user chose to exit.
+    """
+    pygame.init()
+    screen = pygame.display.set_mode(SCREEN_SIZE)
+    pygame.display.set_caption("Terrible Maze")
+    clock = pygame.time.Clock()
+
+    running = True
+    while running:
+        
+        draw_menu(screen)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return False
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_1:  # Start Game
+                    return True
+                elif event.key == pygame.K_2:  # Exit
+                    pygame.quit()
+                    return False
+
+        clock.tick(30)
+
 def main():
     pygame.init()
+
+    # Show the menu
+    if not show_menu():
+        return
 
     # Screen setup
     screen = pygame.display.set_mode(SCREEN_SIZE)
