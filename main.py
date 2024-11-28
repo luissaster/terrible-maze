@@ -61,9 +61,9 @@ def select_start_and_goal(screen, maze):
 
         # Highlight selected start and goal points
         if start:
-            pygame.draw.rect(screen, pygame.Color("green"), (start[1] * CELL_SIZE, start[0] * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+            pygame.draw.rect(screen, pygame.Color("red"), (start[1] * CELL_SIZE, start[0] * CELL_SIZE, CELL_SIZE, CELL_SIZE))
         if goal:
-            pygame.draw.rect(screen, pygame.Color("red"), (goal[1] * CELL_SIZE, goal[0] * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+            pygame.draw.rect(screen, pygame.Color("green"), (goal[1] * CELL_SIZE, goal[0] * CELL_SIZE, CELL_SIZE, CELL_SIZE))
 
         pygame.display.flip()
 
