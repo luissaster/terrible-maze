@@ -17,16 +17,62 @@ from agent import Agent
 from menu import show_menu, save_report
 
 # Constants
-CELL_SIZE = 64
-ROWS, COLS = 12, 12
+CELL_SIZE = 64          # Personal preference, higher values will make the window bigger, lower values will make it smaller
+ROWS, COLS = 12, 12     # You can change this for different mazes, if needed. All mazes defined on maze_layouts.py are 12x12
+
 SCREEN_SIZE = (CELL_SIZE * COLS, CELL_SIZE * ROWS)
 
 # Maze definition
-defined_maze = assignment_maze
+defined_maze = assignment_maze  # You can change this for different mazes, check maze_layouts.py for more (e.g. defined_maze = heart_maze)
+
+def select_start_and_goal(screen, maze):
+    """
+    Interactively selects start and goal points for the maze.
+
+    Parameters:
+        screen (pygame.Surface): The screen to draw on.
+        maze (list of list): A 2D list representing the maze, where 0 represents a wall and 1 represents an open path.
+
+    Returns:
+        tuple: A tuple of two tuples representing the start and goal positions as (row, column).
+    """
+    start = None
+    goal = None
+
+    while start is None or goal is None:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                x, y = pygame.mouse.get_pos()
+                col, row = x // CELL_SIZE, y // CELL_SIZE
+
+                # Check if the clicked cell is walkable (value 1)
+                if maze[row][col] == 1:
+                    if start is None:
+                        start = (row, col)
+                    elif goal is None:
+                        goal = (row, col)
+
+        # Draw the maze
+        screen.fill(pygame.Color("black"))
+        Maze(maze).draw(screen, CELL_SIZE)
+
+        # Highlight selected start and goal points
+        if start:
+            pygame.draw.rect(screen, pygame.Color("green"), (start[1] * CELL_SIZE, start[0] * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+        if goal:
+            pygame.draw.rect(screen, pygame.Color("red"), (goal[1] * CELL_SIZE, goal[0] * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+
+        pygame.display.flip()
+
+    return start, goal
 
 def main():
     pygame.init()
 
+    # Display menu
     algorithm, highlight, speed = show_menu(SCREEN_SIZE)
     if algorithm is None:
         return
@@ -38,9 +84,11 @@ def main():
     # Maze setup
     maze = Maze(defined_maze)
 
+    # Select start and goal points
+    print("Click to select the START point (green) and then the GOAL point (red).")
+    start, goal = select_start_and_goal(screen, maze.maze)
+
     # Agent setup
-    start = (6, 11)
-    goal = (10, 0)
     agent = Agent(start[0], start[1])
 
     # Configure speed

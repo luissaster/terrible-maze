@@ -15,8 +15,6 @@
 # You can make a maze of any size by just changing the values of ROWS and COLS (default is 12x12)
 # Cell Size is more of a personal preference, you can change it to whatever you want, I use 64 because my screen is quite big and it looks better
 
-# Copy the output into defined_maze in main.py
-
 import pygame
 import os
 import datetime
@@ -44,14 +42,26 @@ for i in range(ROWS):
     defined_maze.append(row)
 
 def draw_maze(maze):
+    """
+    Draws the given maze on the screen, with each cell being represented as either a path (white) or a wall (black).
+
+    Parameters:
+        maze (list of list): A 2D list representing the maze, where 0 represents a wall and 1 represents an open path.
+    """
     for row in range(ROWS):
         for col in range(COLS):
             color = WALL_COLOR if maze[row][col] == 0 else PATH_COLOR
             pygame.draw.rect(screen, color, (col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE))
             pygame.draw.rect(screen, GRID_COLOR, (col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE), 1)
 
-# Save the maze
 def save_maze(maze):
+    """
+    Saves the given maze to a file in the "extras/mazes" folder.
+    
+    The file name is a timestamp in the format "%Y-%m-%d_%H-%M-%S" followed by ".txt".
+    
+    Prints the full path of the saved file to the console.
+    """
     folder_name = "extras/mazes"
     os.makedirs(folder_name, exist_ok=True)
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
