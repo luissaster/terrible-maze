@@ -10,12 +10,11 @@
 # |     Projeto 01 - Busca em Labirinto         | 
 # +---------------------------------------------+
 
-import os
-import datetime
 import pygame
 from maze import Maze
+from maze_layouts import *
 from agent import Agent
-from menu import show_menu
+from menu import show_menu, save_report
 
 # Constants
 CELL_SIZE = 64
@@ -23,53 +22,7 @@ ROWS, COLS = 12, 12
 SCREEN_SIZE = (CELL_SIZE * COLS, CELL_SIZE * ROWS)
 
 # Maze definition
-defined_maze = [
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0],
-    [0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0],
-    [0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0],
-    [0, 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 1],
-    [0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0],
-    [0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
-    [0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
-    [0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0],
-    [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0],
-    [1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-]
-
-def save_report(algorithm, start, goal, steps, final_path, path):
-    """
-    Saves the maze solving details to a report file inside the 'txt' folder.
-
-    Parameters:
-        algorithm (str): The algorithm used to solve the maze.
-        start (tuple): The start position (row, col).
-        goal (tuple): The goal position (row, col).
-        final_path (list): The final path taken by the agent.
-        path (list): The complete path explored by the algorithm.
-    """
-    # Ensure the 'txt' folder exists
-    folder_name = "txt"
-    os.makedirs(folder_name, exist_ok=True)
-
-    # Create a timestamped file name
-    timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    filename = os.path.join(folder_name, f"maze_report_{timestamp}.txt")
-
-    # Write report data to the file
-    with open(filename, "w") as file:
-        file.write(f"Algorithm Used: {algorithm}\n")
-        file.write(f"Start Position: {start}\n")
-        file.write(f"Goal Position: {goal}\n\n")
-        file.write(f"Steps Taken: {steps}\n\n")
-        file.write("Complete Path (Explored):\n")
-        file.write(", ".join(map(str, path)) + "\n\n")
-        file.write("Final Path (Optimal):\n")
-        file.write(", ".join(map(str, final_path)) + "\n")
-    
-    print(f"Report saved to {filename}")
-
+defined_maze = assignment_maze
 
 def main():
     pygame.init()
@@ -86,7 +39,7 @@ def main():
     maze = Maze(defined_maze)
 
     # Agent setup
-    start = (4, 11)
+    start = (6, 11)
     goal = (10, 0)
     agent = Agent(start[0], start[1])
 
@@ -129,7 +82,7 @@ def main():
             if (agent.y, agent.x) == goal:
                 reached_goal = True
                 print(f"Goal reached! Total steps: {steps}")
-                save_report(algorithm, start, goal, steps, final_path, path)
+                save_report(algorithm, start, goal, steps, final_path, path, maze.maze)
 
         # Clear the screen
         screen.fill(pygame.Color("black"))
@@ -148,6 +101,13 @@ def main():
 
         # Draw the agent
         agent.draw(screen, CELL_SIZE)
+
+        # Goal reached message
+        if reached_goal:
+            font = pygame.font.Font(None, 64)
+            text = font.render("Goal reached!", 1, pygame.Color("red"))
+            textpos = (10, SCREEN_SIZE[1] - 50)
+            screen.blit(text, textpos)
 
         pygame.display.flip()
         clock.tick(frame_rate)

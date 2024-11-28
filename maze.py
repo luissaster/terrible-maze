@@ -16,20 +16,24 @@ class Maze:
     def __init__(self, maze):
         self.maze = maze
 
-    def draw(self, screen, CELL_SIZE):
+    def draw(self, screen, cell_size):
         """
         Draws the maze on the given screen with the specified cell size.
 
         Parameters:
             screen (pygame.Surface): The screen to draw on.
-            CELL_SIZE (int): The size of each cell in the maze.
+            cell_size (int): The size of each cell in the maze.
         """
-        for row in range(len(self.maze)):
-            for col in range(len(self.maze[row])):
-                if self.maze[row][col] == 0:
-                    pygame.draw.rect(screen, pygame.color.Color("black"), (col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE))
-                elif self.maze[row][col] == 1:
-                    pygame.draw.rect(screen, pygame.color.Color("white"), (col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+        for row_index, row in enumerate(self.maze):
+            for col_index, cell in enumerate(row):
+                if cell == 0:
+                    color = pygame.color.Color("black")
+                elif cell == 1:
+                    color = pygame.color.Color("white")
+
+                pygame.draw.rect(screen, color, (col_index * cell_size, row_index * cell_size, cell_size, cell_size))
+
+                pygame.draw.rect(screen, (200, 200, 200), (col_index * cell_size, row_index * cell_size, cell_size, cell_size), 1)
     
     def draw_path(self, screen, path, color, CELL_SIZE):
         """

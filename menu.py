@@ -11,6 +11,8 @@
 # +---------------------------------------------+
 
 import pygame
+import os
+import datetime
 
 def draw_menu(screen, options, selected_index):
     """
@@ -117,7 +119,43 @@ def show_menu(SCREEN_SIZE) -> tuple:
                         running = False
 
         clock.tick(30)
-        
+
     pygame.quit()
 
     return None, None, None
+
+def save_report(algorithm, start, goal, steps, final_path, path, maze):
+    """
+    Saves the maze solving details to a report file inside the 'txt' folder.
+
+    Parameters:
+        algorithm (str): The algorithm used to solve the maze.
+        start (tuple): The start position (row, col).
+        goal (tuple): The goal position (row, col).
+        final_path (list): The final path taken by the agent.
+        path (list): The complete path explored by the algorithm.
+        maze (list): The maze layout.
+    """
+
+    folder_name = "txt"
+    os.makedirs(folder_name, exist_ok=True)
+
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    filename = os.path.join(folder_name, f"maze_report_{timestamp}.txt")
+
+    # Write report data to the file
+    with open(filename, "w") as file:
+        file.write(f"Algorithm Used: {algorithm}\n")
+        file.write(f"Start Position: {start}\n")
+        file.write(f"Goal Position: {goal}\n\n")
+        file.write(f"Steps Taken: {steps}\n\n")
+        file.write("Complete Path (Explored):\n")
+        file.write(", ".join(map(str, path)) + "\n\n")
+        file.write("Final Path (Optimal):\n")
+        file.write(", ".join(map(str, final_path)) + "\n\n")
+        file.write("Maze Layout:\n[\n")
+        for row in maze:
+            file.write("    " + str(row) + ",\n")
+        file.write("]\n")
+    
+    print(f"Report saved to {filename}")
