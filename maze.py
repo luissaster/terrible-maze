@@ -1,3 +1,15 @@
+# +---------------------------------------------+
+# |     SIN 323 - Inteligência Artificial       |
+# |     Universidade Federal de Viçosa -        |
+# |     Campus Rio Paranaíba                    |
+# |                                             |
+# |     Luís Fernando Almeida - 8102            |
+# |     luis.almeida1@ufv.br                    |
+# |                                             |                               
+# |                                             |
+# |     Projeto 01 - Busca em Labirinto         | 
+# +---------------------------------------------+
+
 import pygame
 
 class Maze:

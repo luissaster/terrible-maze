@@ -1,3 +1,15 @@
+# +---------------------------------------------+
+# |     SIN 323 - Inteligência Artificial       |
+# |     Universidade Federal de Viçosa -        |
+# |     Campus Rio Paranaíba                    |
+# |                                             |
+# |     Luís Fernando Almeida - 8102            |
+# |     luis.almeida1@ufv.br                    |
+# |                                             |                               
+# |                                             |
+# |     Projeto 01 - Busca em Labirinto         | 
+# +---------------------------------------------+
+
 import os
 import datetime
 import pygame
@@ -26,7 +38,7 @@ defined_maze = [
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 ]
 
-def save_report(algorithm, start, goal, final_path, path):
+def save_report(algorithm, start, goal, steps, final_path, path):
     """
     Saves the maze solving details to a report file inside the 'txt' folder.
 
@@ -50,6 +62,7 @@ def save_report(algorithm, start, goal, final_path, path):
         file.write(f"Algorithm Used: {algorithm}\n")
         file.write(f"Start Position: {start}\n")
         file.write(f"Goal Position: {goal}\n\n")
+        file.write(f"Steps Taken: {steps}\n\n")
         file.write("Complete Path (Explored):\n")
         file.write(", ".join(map(str, path)) + "\n\n")
         file.write("Final Path (Optimal):\n")
@@ -116,7 +129,7 @@ def main():
             if (agent.y, agent.x) == goal:
                 reached_goal = True
                 print(f"Goal reached! Total steps: {steps}")
-                save_report(algorithm, start, goal, final_path, path)
+                save_report(algorithm, start, goal, steps, final_path, path)
 
         # Clear the screen
         screen.fill(pygame.Color("black"))

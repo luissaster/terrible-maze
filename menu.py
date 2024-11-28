@@ -1,3 +1,15 @@
+# +---------------------------------------------+
+# |     SIN 323 - Inteligência Artificial       |
+# |     Universidade Federal de Viçosa -        |
+# |     Campus Rio Paranaíba                    |
+# |                                             |
+# |     Luís Fernando Almeida - 8102            |
+# |     luis.almeida1@ufv.br                    |
+# |                                             |                               
+# |                                             |
+# |     Projeto 01 - Busca em Labirinto         | 
+# +---------------------------------------------+
+
 import pygame
 
 def draw_menu(screen, options, selected_index):
@@ -74,36 +86,38 @@ def show_menu(SCREEN_SIZE) -> tuple:
                 elif event.key == pygame.K_DOWN:
                     selected_index = (selected_index + 1) % len(options)
                 elif event.key == pygame.K_RETURN:
-                    if selected_index == 0:  # Start Game
+                    if selected_index == 0:         # Start Game
                         return (
                             available_algorithms[current_algorithm_index],
                             available_highlights[current_highlight_index],
                             available_speeds[current_speed_index]
                         )
-                    elif selected_index == 1:  # Change algorithm
+                    elif selected_index == 1:       # Change algorithm
                         current_algorithm_index = (
                             current_algorithm_index + 1
                         ) % len(available_algorithms)
                         options[1] = (
                             f"Algorithm: {available_algorithms[current_algorithm_index]}"
                         )
-                    elif selected_index == 2:  # Change highlight
+                    elif selected_index == 2:       # Change highlight
                         current_highlight_index = (
                             current_highlight_index + 1
                         ) % len(available_highlights)
                         options[2] = (
                             f"Highlight: {available_highlights[current_highlight_index]}"
                         )
-                    elif selected_index == 3:  # Change agent speed
+                    elif selected_index == 3:       # Change agent speed (a.k.a. game framerate)
                         current_speed_index = (
                             current_speed_index + 1
                         ) % len(available_speeds)
                         options[3] = (
                             f"Agent Speed: {available_speeds[current_speed_index]}"
                         )
-                    elif selected_index == 4:  # Exit
+                    elif selected_index == 4:       # Exit
                         running = False
 
         clock.tick(30)
+        
     pygame.quit()
+
     return None, None, None

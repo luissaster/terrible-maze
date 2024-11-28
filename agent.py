@@ -1,4 +1,17 @@
+# +---------------------------------------------+
+# |     SIN 323 - Inteligência Artificial       |
+# |     Universidade Federal de Viçosa -        |
+# |     Campus Rio Paranaíba                    |
+# |                                             |
+# |     Luís Fernando Almeida - 8102            |
+# |     luis.almeida1@ufv.br                    |
+# |                                             |                               
+# |                                             |
+# |     Projeto 01 - Busca em Labirinto         | 
+# +---------------------------------------------+
+
 import pygame
+from queue import PriorityQueue
 from collections import deque
 
 class Agent:
@@ -90,9 +103,9 @@ class Agent:
                 and a list of all visited cells.
         """
         queue = deque([start])
-        visited = set()  # To keep track of visited cells
-        came_from = {}  # To reconstruct the shortest path
-        all_visited = []  # List to store all visited cells for drawing
+        visited = set()                 # To keep track of visited cells
+        came_from = {}                  # To reconstruct the shortest path
+        all_visited = []                # List to store all visited cells for drawing
 
         visited.add(start)
 
@@ -104,14 +117,13 @@ class Agent:
             # Add the current cell to the list of visited cells
             all_visited.append(current)
 
-            # Check if we reached the goal
             if current == goal:
                 # Reconstruct the path to the goal
                 path = []
                 while current:
                     path.append(current)
                     current = came_from.get(current)
-                return path[::-1], steps, all_visited  # Return the path, total steps, and all visited cells
+                return path[::-1], steps, all_visited
 
             # Explore neighbors (in the order: ↑ up, ← left, → right, ↓ down)
             neighbors = self.get_neighbors(maze, current)
@@ -140,9 +152,9 @@ class Agent:
         """
 
         stack = [start]
-        visited = set()  # To keep track of visited cells
-        came_from = {}  # To reconstruct the shortest path
-        all_visited = []  # List to store all visited cells for drawing
+        visited = set()         # To keep track of visited cells
+        came_from = {}          # To reconstruct the shortest path
+        all_visited = []        # List to store all visited cells for drawing
 
         visited.add(start)
 
@@ -154,7 +166,6 @@ class Agent:
             # Add the current cell to the list of visited cells
             all_visited.append(current)
 
-            # Check if we reached the goal
             if current == goal:
                 # Reconstruct the path to the goal
                 path = []
@@ -164,6 +175,7 @@ class Agent:
                 return path[::-1], steps, all_visited  # Return the path, total steps, and all visited cells
 
             # Explore neighbors (in the order: ↑ up, ← left, → right, ↓ down)
+            # As Depth First Search works with a LIFO stack, results are reversed (it will look like the order is ↓ down, → right, ← left, ↑ up)
             neighbors = self.get_neighbors(maze, current)
             for neighbor in neighbors:
                 if neighbor not in visited:
@@ -174,4 +186,78 @@ class Agent:
             steps += 1
 
         return None, steps, all_visited
+    
+    def a_star_search(self, maze, start, goal):
+        """
+        Performs the A* search algorithm to find the shortest path from the start to the goal.
 
+        Parameters:
+            maze (list): A 2D list representing the maze. 0 represents a wall and 1 represents an open path.
+            start (tuple): The starting position of the search. A tuple of two integers (row, column).
+            goal (tuple): The goal position of the search. A tuple of two integers (row, column).
+
+        Returns:
+            tuple: A tuple containing the shortest path as a list of tuples, the total number of steps taken,
+                and a list of all visited cells.
+        """
+        def heuristic(a, b):
+            """
+            Calculates the Euclidean distance heuristic between two points.
+            
+            Parameters:
+                a (tuple): The first point (row, column).
+                b (tuple): The second point (row, column).
+
+            Returns:
+                float: The Euclidean distance between the points.
+            """
+
+            # Manhattan distance would have better results, as we are working on a 2D grid with limited directions (↑ up, ← left, → right, ↓ down)
+            # Euclidean distance is more useful in scenarios where there are diagonal directions (↖ up-left, ↗ up-right, ↙ down-left, ↘ down-right)
+            return ((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2) ** 0.5
+
+        open_set = PriorityQueue()
+        open_set.put((0, start))                    # Priority queue stores -> (priority, node)
+        came_from = {}                              # To reconstruct the path
+        g_score = {start: 0}                        # Cost from start to the current node
+        f_score = {start: heuristic(start, goal)}   # Estimated cost from start to goal
+
+        visited = set()                             # To track visited nodes
+        all_visited = []                            # To store the order of visited cells for drawing
+        steps = 0
+
+        while not open_set.empty():
+            _, current = open_set.get()
+
+            # Add to visited for visualization
+            all_visited.append(current)
+
+            
+            if current == goal:
+                path = []
+                while current:
+                    path.append(current)
+                    current = came_from.get(current)
+                return path[::-1], steps, all_visited
+
+            visited.add(current)
+
+            # Explore neighbors
+            neighbors = self.get_neighbors(maze, current)
+            for neighbor in neighbors:
+                if neighbor in visited:
+                    continue
+
+                tentative_g_score = g_score.get(current, float('inf')) + 1
+
+                if tentative_g_score < g_score.get(neighbor, float('inf')):
+
+                    # Update path
+                    came_from[neighbor] = current
+                    g_score[neighbor] = tentative_g_score
+                    f_score[neighbor] = tentative_g_score + heuristic(neighbor, goal)
+                    open_set.put((f_score[neighbor], neighbor))
+
+            steps += 1
+
+        return None, steps, all_visited
