@@ -212,8 +212,8 @@ class Agent:
                 float: The Euclidean distance between the points.
             """
 
-            # Manhattan distance would have better results, as we are working on a 2D grid with limited directions (↑ up, ← left, → right, ↓ down)
-            # Euclidean distance is more useful in scenarios where there are diagonal directions (↖ up-left, ↗ up-right, ↙ down-left, ↘ down-right)
+            # Manhattan distance would probably have better results, as we are working on a 2D grid with limited directions (↑ up, ← left, → right, ↓ down)
+            # Euclidean distance is more useful in scenarios where there are diagonal movement (↖ up-left, ↗ up-right, ↙ down-left, ↘ down-right)
             return ((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2) ** 0.5
 
         open_set = PriorityQueue()
