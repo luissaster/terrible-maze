@@ -44,7 +44,7 @@ def draw_menu(screen, options, selected_index):
 
     pygame.display.flip()
 
-def show_menu(SCREEN_SIZE) -> tuple:
+def show_menu(SCREEN_SIZE):
     """
     Shows the main menu and waits for user input. Returns the selected algorithm, highlight option, and agent speed as a tuple of three strings. 
     If the user selects Exit, returns (None, None, None).
