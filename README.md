@@ -1,4 +1,4 @@
-# Projeto de Inteligência Artifical
+# Projeto de Inteligência Artificial
 
 ## SIN 323 - Inteligência Artificial
 ## Universidade Federal de Viçosa - Campus Rio Paranaíba
